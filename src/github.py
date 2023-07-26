@@ -81,15 +81,15 @@ def list_branches(owner: str, repo: str, token: str, **kwargs) -> dict:
     resource_path = f"/repos/{owner}/{repo}/branches"
     return list_github_resource(resource_path, token, **kwargs)
 
-def list_users(token: str, **kwargs) -> dict:
+def list_users(token: str, since=None, **kwargs) -> dict:
     """Return a list of GitHub users"""
     resource_path = "/users"
-    return list_github_resource(resource_path, token, **kwargs)
+    return list_github_resource(resource_path, token, since=since, **kwargs)
 
-def list_organizations(token: str, **kwargs) -> dict:
+def list_organizations(token: str, since=None, **kwargs) -> dict:
     """Return a list of GitHub organizations"""
     resource_path = "/organizations"
-    return list_github_resource(resource_path, token, **kwargs)
+    return list_github_resource(resource_path, token, since=since, **kwargs)
 
 def list_org_repos(org_name: str, token: str, **kwargs) -> dict:
     """Return a list of GitHub repos for the specified organization"""
@@ -145,10 +145,11 @@ class GitHubPaginator:
         return PaginatedGitHubResource(list_function, self.token, self.per_page, **kwargs)
 
 class PaginatedGitHubResource:
-    def __init__(self, list_function, token, per_page, **kwargs):
+    def __init__(self, list_function, token, per_page, since=None, **kwargs):
         self.list_function = list_function
         self.per_page = per_page
         self.token = token
+        self.since = since
         self.kwargs = kwargs
         self.data = []
         self.next_page_url = None
@@ -162,7 +163,7 @@ class PaginatedGitHubResource:
                     response = self.list_function(token=self.token, **self.kwargs)
                 else:
                     # If we don't have a next page URL, we fetch the first page
-                    response = self.list_function(token=self.token, per_page=self.per_page, **self.kwargs)
+                    response = self.list_function(token=self.token, per_page=self.per_page, since=self.since, **self.kwargs)
                 
                 self.data = response.get("data", [])
                 

@@ -29,20 +29,34 @@ repo = "gfe-db"
 # pages = paginator.get_paginator(list_users)
 
 # for user in pages:
-#     print(user['login'])
+#     print(user['id'])
+
+# # USERS SINCE ID
+# paginator = GitHubPaginator(GITHUB_PERSONAL_ACCESS_TOKEN)
+# pages = paginator.get_paginator(list_users, since=547)
+
+# for user in pages:
+#     print(user['id'])
 
 # # ORGS
 # paginator = GitHubPaginator(GITHUB_PERSONAL_ACCESS_TOKEN)
 # pages = paginator.get_paginator(list_organizations)
 
-# for org in pages:
-#     print(org['login'])
+# for idx, org in enumerate(pages):
+#     print(idx, org['id'], org['login'])
 
-# ORG REPOS
+# ORGS SINCE ID
 paginator = GitHubPaginator(GITHUB_PERSONAL_ACCESS_TOKEN)
-pages = paginator.get_paginator(list_org_repos, org_name="nmdp-bioinformatics")
+pages = paginator.get_paginator(list_organizations, since=69404)
 
-for idx, repo in enumerate(pages):
-    print(idx, repo['name'])
+for idx, org in enumerate(pages):
+    print(idx, org['id'], org['login'])
+
+# # ORG REPOS
+# paginator = GitHubPaginator(GITHUB_PERSONAL_ACCESS_TOKEN)
+# pages = paginator.get_paginator(list_org_repos, org_name="nmdp-bioinformatics")
+
+# for idx, repo in enumerate(pages):
+#     print(idx, repo['name'])
 
 print("Done")
