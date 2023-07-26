@@ -1,40 +1,41 @@
 import os
 from dotenv import load_dotenv, find_dotenv
 
-load_dotenv(find_dotenv())
-from src.github import (
-    list_commits, 
-    list_users, 
-    list_organizations, 
-    list_org_repos,
-    list_contributors,
-    check_rate_limit,
-    paginate_github_resource
-)
+load_dotenv(find_dotenv());
+
+from src.github import *
 
 GITHUB_PERSONAL_ACCESS_TOKEN = os.environ["GITHUB_PERSONAL_ACCESS_TOKEN"]
 
 owner = "awsdocs"
 repo = "aws-doc-sdk-examples"
 
-# commits = list_commits(owner, repo, token=GITHUB_PERSONAL_ACCESS_TOKEN, params={"per_page": 100, "page": 1})
-# users = list_users(token=GITHUB_PERSONAL_ACCESS_TOKEN, params={"per_page": 100, "page": 1})
-# orgs = list_organizations(token=GITHUB_PERSONAL_ACCESS_TOKEN, params={"per_page": 100, "page": 1})
-# org_repos = list_org_repos(
-#     owner, token=GITHUB_PERSONAL_ACCESS_TOKEN, params={"per_page": 100, "page": 1}
-# )
-# contributors = list_contributors(
-#     owner, repo, token=GITHUB_PERSONAL_ACCESS_TOKEN, params={"per_page": 100, "page": 1}
-# )
+# # COMMITS
+# paginator = GitHubPaginator(GITHUB_PERSONAL_ACCESS_TOKEN)
+# paged_commits = paginator.get_paginator(list_commits, owner=owner, repo=repo)
 
-# rate_limit = check_rate_limit(token=GITHUB_PERSONAL_ACCESS_TOKEN)
-# print(len(rate_limit))
+# for commit in paged_commits:
+#     print(commit['sha'])
 
+# # BRANCHES
+# paginator = GitHubPaginator(GITHUB_PERSONAL_ACCESS_TOKEN)
+# paged_commits = paginator.get_paginator(list_branches, owner=owner, repo=repo)
 
-for idx, org in enumerate(paginate_github_resource(list_organizations, token=GITHUB_PERSONAL_ACCESS_TOKEN)):
-    print(idx, org["login"])
+# for branch in paged_commits:
+#     print(branch['name'])
 
-    if idx > 300:
-        break
+# USERS
+paginator = GitHubPaginator(GITHUB_PERSONAL_ACCESS_TOKEN)
+pages = paginator.get_paginator(list_users)
+
+for user in pages:
+    print(user['login'])
+
+# # ORGS
+# paginator = GitHubPaginator(GITHUB_PERSONAL_ACCESS_TOKEN)
+# pages = paginator.get_paginator(list_organizations)
+
+# for org in pages:
+#     print(org['login'])
 
 print("Done")

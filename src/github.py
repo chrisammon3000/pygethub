@@ -1,5 +1,6 @@
 import time
 import requests
+from urllib.parse import urlparse, parse_qs
 
 session = requests.Session()
 
@@ -46,7 +47,20 @@ def fetch(url: str, token: str, **params) -> dict:
     delay = calculate_delay(response)
     time.sleep(delay)
     
-    return {"success": True, "data": response.json()}
+    # Return data along with link header for pagination
+    return {"success": True, "data": response.json(), "link": response.headers.get('Link')}
+
+def get_next_page_url(link_header):
+    """Extract next page URL from link header"""
+    if link_header is None:
+        return None
+
+    links = link_header.split(", ")
+    for link in links:
+        url, rel = link.split("; ")
+        if "rel=\"next\"" in rel:
+            return url.strip("<>")
+    return None
 
 
 def list_github_resource(resource_path: str, token: str, **kwargs) -> dict:
@@ -97,17 +111,67 @@ def check_rate_limit(token: str, **kwargs) -> dict:
     resource_path = "/rate_limit"
     return list_github_resource(resource_path, token, **kwargs)
 
-def paginate_github_resource(list_function, start_page=1, per_page=100, **kwargs):
-    page = start_page
-    while True:
-        response = list_function(page=page, per_page=per_page, **kwargs)
-        data = response.get("data", [])
+# def paginate_github_resource(list_function, start_page=1, per_page=100, **kwargs):
+#     page = start_page
+#     while True:
+#         response = list_function(page=page, per_page=per_page, **kwargs)
+#         data = response.get("data", [])
         
-        if not data:
-            break
+#         if not data:
+#             break
 
-        for item in data:
-            yield item
+#         for item in data:
+#             yield item
 
-        print(f"Page {page}: {len(data)} items")
-        page += 1
+#         print(f"Page {page}: {len(data)} items")
+
+#         # Get next page URL from link header
+#         next_page_url = get_next_page_url(response.get('link', ''))
+#         if not next_page_url:
+#             break
+
+#         # Update list function to use next page URL
+#         list_function = lambda **params: fetch(next_page_url, **params)
+
+
+class GitHubPaginator:
+    def __init__(self, token, per_page=100):
+        self.token = token
+        self.per_page = per_page
+
+    def get_paginator(self, list_function, **kwargs):
+        return PaginatedGitHubResource(list_function, self.token, self.per_page, **kwargs)
+
+
+class PaginatedGitHubResource:
+    def __init__(self, list_function, token, per_page, **kwargs):
+        self.list_function = list_function
+        self.page = 1
+        self.per_page = per_page
+        self.token = token
+        self.kwargs = kwargs
+        self.data = []
+        self.next_page_url = None
+
+    def __iter__(self):
+        while True:
+            if not self.data:
+                response = self.list_function(token=self.token, page=self.page, per_page=self.per_page, **self.kwargs)
+                self.data = response.get("data", [])
+                
+                if not self.data:
+                    break
+
+                print(f"Page {self.page}: {len(self.data)} items")
+
+                # Get next page URL from link header
+                self.next_page_url = get_next_page_url(response.get('link', ''))
+                if self.next_page_url:
+                    self.list_function = lambda token, **params: fetch(self.next_page_url, token, **params)
+
+                self.page += 1
+
+            yield self.data.pop(0)
+
+
+
