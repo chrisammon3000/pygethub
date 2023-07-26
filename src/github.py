@@ -111,27 +111,29 @@ def check_rate_limit(token: str, **kwargs) -> dict:
     resource_path = "/rate_limit"
     return list_github_resource(resource_path, token, **kwargs)
 
-# def paginate_github_resource(list_function, start_page=1, per_page=100, **kwargs):
-#     page = start_page
-#     while True:
-#         response = list_function(page=page, per_page=per_page, **kwargs)
-#         data = response.get("data", [])
+
+## Not Used ##
+def paginate_github_resource(list_function, start_page=1, per_page=100, **kwargs):
+    page = start_page
+    while True:
+        response = list_function(page=page, per_page=per_page, **kwargs)
+        data = response.get("data", [])
         
-#         if not data:
-#             break
+        if not data:
+            break
 
-#         for item in data:
-#             yield item
+        for item in data:
+            yield item
 
-#         print(f"Page {page}: {len(data)} items")
+        print(f"Page {page}: {len(data)} items")
 
-#         # Get next page URL from link header
-#         next_page_url = get_next_page_url(response.get('link', ''))
-#         if not next_page_url:
-#             break
+        # Get next page URL from link header
+        next_page_url = get_next_page_url(response.get('link', ''))
+        if not next_page_url:
+            break
 
-#         # Update list function to use next page URL
-#         list_function = lambda **params: fetch(next_page_url, **params)
+        # Update list function to use next page URL
+        list_function = lambda **params: fetch(next_page_url, **params)
 
 
 class GitHubPaginator:
@@ -142,36 +144,44 @@ class GitHubPaginator:
     def get_paginator(self, list_function, **kwargs):
         return PaginatedGitHubResource(list_function, self.token, self.per_page, **kwargs)
 
-
 class PaginatedGitHubResource:
     def __init__(self, list_function, token, per_page, **kwargs):
         self.list_function = list_function
-        self.page = 1
         self.per_page = per_page
         self.token = token
         self.kwargs = kwargs
         self.data = []
         self.next_page_url = None
+        self.page_counter = 0  # Create a page counter to count the pages.
 
     def __iter__(self):
         while True:
             if not self.data:
-                response = self.list_function(token=self.token, page=self.page, per_page=self.per_page, **self.kwargs)
+                if self.next_page_url:
+                    # If we have a next page URL, we use it directly
+                    response = self.list_function(token=self.token, **self.kwargs)
+                else:
+                    # If we don't have a next page URL, we fetch the first page
+                    response = self.list_function(token=self.token, per_page=self.per_page, **self.kwargs)
+                
                 self.data = response.get("data", [])
                 
                 if not self.data:
                     break
 
-                print(f"Page {self.page}: {len(self.data)} items")
+                self.page_counter += 1  # Increment the page counter
+                print(f"Page {self.page_counter}: {len(self.data)} items")
 
                 # Get next page URL from link header
                 self.next_page_url = get_next_page_url(response.get('link', ''))
                 if self.next_page_url:
                     self.list_function = lambda token, **params: fetch(self.next_page_url, token, **params)
+                else:
+                    while self.data:
+                        yield self.data.pop(0)
 
-                self.page += 1
+                    break # No more pages to fetch
 
             yield self.data.pop(0)
-
 
 

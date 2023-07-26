@@ -7,29 +7,29 @@ from src.github import *
 
 GITHUB_PERSONAL_ACCESS_TOKEN = os.environ["GITHUB_PERSONAL_ACCESS_TOKEN"]
 
-owner = "awsdocs"
-repo = "aws-doc-sdk-examples"
+owner = "nmdp-bioinformatics"
+repo = "gfe-db"
 
 # # COMMITS
 # paginator = GitHubPaginator(GITHUB_PERSONAL_ACCESS_TOKEN)
-# paged_commits = paginator.get_paginator(list_commits, owner=owner, repo=repo)
+# pages = paginator.get_paginator(list_commits, owner=owner, repo=repo)
 
-# for commit in paged_commits:
+# for commit in pages:
 #     print(commit['sha'])
 
 # # BRANCHES
 # paginator = GitHubPaginator(GITHUB_PERSONAL_ACCESS_TOKEN)
-# paged_commits = paginator.get_paginator(list_branches, owner=owner, repo=repo)
+# pages = paginator.get_paginator(list_branches, owner=owner, repo=repo)
 
-# for branch in paged_commits:
+# for branch in pages:
 #     print(branch['name'])
 
-# USERS
-paginator = GitHubPaginator(GITHUB_PERSONAL_ACCESS_TOKEN)
-pages = paginator.get_paginator(list_users)
+# # USERS
+# paginator = GitHubPaginator(GITHUB_PERSONAL_ACCESS_TOKEN)
+# pages = paginator.get_paginator(list_users)
 
-for user in pages:
-    print(user['login'])
+# for user in pages:
+#     print(user['login'])
 
 # # ORGS
 # paginator = GitHubPaginator(GITHUB_PERSONAL_ACCESS_TOKEN)
@@ -37,5 +37,12 @@ for user in pages:
 
 # for org in pages:
 #     print(org['login'])
+
+# ORG REPOS
+paginator = GitHubPaginator(GITHUB_PERSONAL_ACCESS_TOKEN)
+pages = paginator.get_paginator(list_org_repos, org_name="nmdp-bioinformatics")
+
+for idx, repo in enumerate(pages):
+    print(idx, repo['name'])
 
 print("Done")
