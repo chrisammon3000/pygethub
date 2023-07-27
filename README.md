@@ -1,4 +1,5 @@
 # pygethub
+[![Build](https://github.com/chrisammon3000/pygethub/actions/workflows/run_tests.yml/badge.svg?style=for-the-badge)](https://github.com/chrisammon3000/pygethub/actions/workflows/run_tests.yml) [![codecov](https://codecov.io/github/chrisammon3000/pygethub/branch/main/graph/badge.svg?token=QSZLP51RWJ)](https://codecov.io/github/chrisammon3000/pygethub?style=for-the-badge) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100/)
 
 `pygethub` is a simple Python library for working with the GitHub API. It provides easy-to-use functions for common tasks and supports pagination through the API responses.
 
