@@ -6,7 +6,15 @@ from requests.exceptions import HTTPError
 from pygethub.resources import (
     calculate_delay,
     fetch,
-    list_github_resource
+    list_github_resource,
+    list_commits,
+    list_branches,
+    list_users,
+    list_organizations,
+    list_org_repos,
+    list_user_repos,
+    list_contributors,
+    check_rate_limit
 )
 
 def test_calculate_delay():
@@ -105,9 +113,6 @@ def test_fetch_respects_rate_limit(mock_sleep, mock_get):
     # Assert sleep was called with the correct delay
     mock_sleep.assert_called_once_with(1)
 
-from unittest.mock import patch, MagicMock
-import pygethub
-
 def test_list_github_resource():
     # Mock the fetch function
     with patch('pygethub.resources.fetch', autospec=True) as mock_fetch:
@@ -137,3 +142,157 @@ def test_list_github_resource_with_additional_arguments():
 
         # Assert the function returned the result from fetch
         assert result == {"success": True, "data": "data", "link": None}
+
+def test_list_commits():
+    owner = 'test_owner'
+    repo = 'test_repo'
+    token = 'test_token'
+    additional_arg = 'test_arg'
+    
+    # Mock the list_github_resource function
+    with patch('pygethub.resources.list_github_resource', autospec=True) as mock_list_github_resource:
+        # Configure the mock to return a specific value
+        mock_list_github_resource.return_value = 'test_return_value'
+
+        # Call the function
+        result = list_commits(owner, repo, token, additional_arg=additional_arg)
+
+        # Check that list_github_resource was called with the correct arguments
+        mock_list_github_resource.assert_called_once_with(f"/repos/{owner}/{repo}/commits", token, additional_arg=additional_arg)
+        
+        # Check that the return value is correct
+        assert result == 'test_return_value'
+
+def test_list_branches():
+    owner = 'test_owner'
+    repo = 'test_repo'
+    token = 'test_token'
+    additional_arg = 'test_arg'
+    
+    # Mock the list_github_resource function
+    with patch('pygethub.resources.list_github_resource', autospec=True) as mock_list_github_resource:
+        # Configure the mock to return a specific value
+        mock_list_github_resource.return_value = 'test_return_value'
+
+        # Call the function
+        result = list_branches(owner, repo, token, additional_arg=additional_arg)
+
+        # Check that list_github_resource was called with the correct arguments
+        mock_list_github_resource.assert_called_once_with(f"/repos/{owner}/{repo}/branches", token, additional_arg=additional_arg)
+        
+        # Check that the return value is correct
+        assert result == 'test_return_value'
+
+def test_list_users():
+    token = 'test_token'
+    since = 123
+    additional_arg = 'test_arg'
+    
+    # Mock the list_github_resource function
+    with patch('pygethub.resources.list_github_resource', autospec=True) as mock_list_github_resource:
+        # Configure the mock to return a specific value
+        mock_list_github_resource.return_value = 'test_return_value'
+
+        # Call the function
+        result = list_users(token, since=since, additional_arg=additional_arg)
+
+        # Check that list_github_resource was called with the correct arguments
+        mock_list_github_resource.assert_called_once_with("/users", token, since=since, additional_arg=additional_arg)
+        
+        # Check that the return value is correct
+        assert result == 'test_return_value'
+
+def test_list_organizations():
+    token = 'test_token'
+    since = 123
+    additional_arg = 'test_arg'
+    
+    # Mock the list_github_resource function
+    with patch('pygethub.resources.list_github_resource', autospec=True) as mock_list_github_resource:
+        # Configure the mock to return a specific value
+        mock_list_github_resource.return_value = 'test_return_value'
+
+        # Call the function
+        result = list_organizations(token, since=since, additional_arg=additional_arg)
+
+        # Check that list_github_resource was called with the correct arguments
+        mock_list_github_resource.assert_called_once_with("/organizations", token, since=since, additional_arg=additional_arg)
+        
+        # Check that the return value is correct
+        assert result == 'test_return_value'
+
+def test_list_org_repos():
+    org_name = 'test_org'
+    token = 'test_token'
+    additional_arg = 'test_arg'
+    
+    # Mock the list_github_resource function
+    with patch('pygethub.resources.list_github_resource', autospec=True) as mock_list_github_resource:
+        # Configure the mock to return a specific value
+        mock_list_github_resource.return_value = 'test_return_value'
+
+        # Call the function
+        result = list_org_repos(org_name, token, additional_arg=additional_arg)
+
+        # Check that list_github_resource was called with the correct arguments
+        mock_list_github_resource.assert_called_once_with(f"/orgs/{org_name}/repos", token, additional_arg=additional_arg)
+        
+        # Check that the return value is correct
+        assert result == 'test_return_value'
+
+def test_list_user_repos():
+    username = 'test_user'
+    token = 'test_token'
+    additional_arg = 'test_arg'
+    
+    # Mock the list_github_resource function
+    with patch('pygethub.resources.list_github_resource', autospec=True) as mock_list_github_resource:
+        # Configure the mock to return a specific value
+        mock_list_github_resource.return_value = 'test_return_value'
+
+        # Call the function
+        result = list_user_repos(username, token, additional_arg=additional_arg)
+
+        # Check that list_github_resource was called with the correct arguments
+        mock_list_github_resource.assert_called_once_with(f"/users/{username}/repos", token, additional_arg=additional_arg)
+        
+        # Check that the return value is correct
+        assert result == 'test_return_value'
+
+def test_list_contributors():
+    owner = 'test_owner'
+    repo = 'test_repo'
+    token = 'test_token'
+    additional_arg = 'test_arg'
+    
+    # Mock the list_github_resource function
+    with patch('pygethub.resources.list_github_resource', autospec=True) as mock_list_github_resource:
+        # Configure the mock to return a specific value
+        mock_list_github_resource.return_value = 'test_return_value'
+
+        # Call the function
+        result = list_contributors(owner, repo, token, additional_arg=additional_arg)
+
+        # Check that list_github_resource was called with the correct arguments
+        mock_list_github_resource.assert_called_once_with(f"/repos/{owner}/{repo}/contributors", token, additional_arg=additional_arg)
+        
+        # Check that the return value is correct
+        assert result == 'test_return_value'
+
+def test_check_rate_limit():
+    token = 'test_token'
+    additional_arg = 'test_arg'
+    
+    # Mock the list_github_resource function
+    with patch('pygethub.resources.list_github_resource', autospec=True) as mock_list_github_resource:
+        # Configure the mock to return a specific value
+        mock_list_github_resource.return_value = 'test_return_value'
+
+        # Call the function
+        result = check_rate_limit(token, additional_arg=additional_arg)
+
+        # Check that list_github_resource was called with the correct arguments
+        mock_list_github_resource.assert_called_once_with("/rate_limit", token, additional_arg=additional_arg)
+        
+        # Check that the return value is correct
+        assert result == 'test_return_value'
