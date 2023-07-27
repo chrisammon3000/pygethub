@@ -12,14 +12,6 @@ def get_next_page_url(link_header):
             return url.strip("<>")
     return None
 
-class GitHubPaginator:
-    def __init__(self, token, per_page=100):
-        self.token = token
-        self.per_page = per_page
-
-    def get_paginator(self, list_function, **kwargs):
-        return PaginatedGitHubResource(list_function, self.token, self.per_page, **kwargs)
-
 class PaginatedGitHubResource:
     def __init__(self, list_function, token, per_page, since=None, **kwargs):
         self.list_function = list_function
@@ -60,3 +52,11 @@ class PaginatedGitHubResource:
                     break # No more pages to fetch
 
             yield self.data.pop(0)
+
+class GitHubPaginator:
+    def __init__(self, token, per_page=100):
+        self.token = token
+        self.per_page = per_page
+
+    def get_paginator(self, list_function, **kwargs):
+        return PaginatedGitHubResource(list_function, self.token, self.per_page, **kwargs)

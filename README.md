@@ -62,7 +62,3 @@ Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md)
 ## License
 
 `pygethub` is licensed under the terms of the MIT license. See the [LICENSE](LICENSE) file for the full license text.
-
----
-
-Note: Replace `#` with the actual link to your documentation and contributing guide.

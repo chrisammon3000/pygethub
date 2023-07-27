@@ -4,3 +4,6 @@
 .pytest_cache
 *.egg-info
 .coverage
+buid/
+dist/
+DISTRIBUTION.md
