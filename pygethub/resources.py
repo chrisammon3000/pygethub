@@ -31,9 +31,8 @@ def calculate_delay(response):
 def fetch(url: str, token: str, **params) -> dict:
     session.headers["Authorization"] = f"token {token}"
     
-    response = session.get(url, params=params)
-
     try:
+        response = session.get(url, params=params)
         response.raise_for_status()
     except requests.HTTPError as http_err:
         # Add additional error information

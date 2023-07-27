@@ -2,9 +2,11 @@ import pytest
 import time
 from unittest.mock import Mock, patch
 from requests.models import Response
+from requests.exceptions import HTTPError
 from pygethub.resources import (
     calculate_delay,
-    fetch
+    fetch,
+    list_github_resource
 )
 
 def test_calculate_delay():
@@ -62,7 +64,32 @@ def test_fetch_success(mock_get):
 
 
 @patch('requests.Session.get', autospec=True)
-def test_fetch_respects_rate_limit(mock_get):
+def test_fetch_http_error(mock_get):
+    # Configure the mock get to raise an HTTPError
+    mock_get.side_effect = HTTPError('HTTP Error occurred')
+
+    # Call the function
+    result = fetch('https://api.github.com/users', 'token')
+
+    # Assert the function returned the expected result
+    assert result == {"success": False, "message": 'HTTP Error occurred'}
+
+
+@patch('requests.Session.get', autospec=True)
+def test_fetch_unexpected_error(mock_get):
+    # Configure the mock get to raise an Exception
+    mock_get.side_effect = Exception('Unexpected error')
+
+    # Call the function
+    result = fetch('https://api.github.com/users', 'token')
+
+    # Assert the function returned the expected result
+    assert result == {"success": False, "message": 'Unexpected error'}
+
+
+@patch('requests.Session.get', autospec=True)
+@patch('time.sleep', side_effect=lambda x: None)  # Mock sleep to avoid actual delay
+def test_fetch_respects_rate_limit(mock_sleep, mock_get):
     # Create a mock response
     mock_response = Mock(spec=Response)
     mock_response.raise_for_status.return_value = None
@@ -73,10 +100,40 @@ def test_fetch_respects_rate_limit(mock_get):
     mock_get.return_value = mock_response
 
     # Call the function with the mock response
-    start_time = time.time()
-    result = fetch('https://api.github.com/users', 'token')
-    end_time = time.time()
+    fetch('https://api.github.com/users', 'token')
 
-    # Assert the function returned the expected result and respected the rate limit
-    assert result == {"success": True, "data": {"key": "value"}, "link": None}
-    assert end_time - start_time >= 1  # Ensure delay was at least 1 second
+    # Assert sleep was called with the correct delay
+    mock_sleep.assert_called_once_with(1)
+
+from unittest.mock import patch, MagicMock
+import pygethub
+
+def test_list_github_resource():
+    # Mock the fetch function
+    with patch('pygethub.resources.fetch', autospec=True) as mock_fetch:
+        # Configure the mock to return a specific dictionary
+        mock_fetch.return_value = {"success": True, "data": "data", "link": None}
+
+        # Call the function with a specific resource path and token
+        result = list_github_resource('/users', 'token')
+
+        # Assert the function called fetch with the correct URL and token
+        mock_fetch.assert_called_once_with('https://api.github.com/users', 'token')
+
+        # Assert the function returned the result from fetch
+        assert result == {"success": True, "data": "data", "link": None}
+
+def test_list_github_resource_with_additional_arguments():
+    # Mock the fetch function
+    with patch('pygethub.resources.fetch', autospec=True) as mock_fetch:
+        # Configure the mock to return a specific dictionary
+        mock_fetch.return_value = {"success": True, "data": "data", "link": None}
+
+        # Call the function with a specific resource path, token, and extra arguments
+        result = list_github_resource('/users', 'token', param1='value1', param2='value2')
+
+        # Assert the function called fetch with the correct URL, token, and extra arguments
+        mock_fetch.assert_called_once_with('https://api.github.com/users', 'token', param1='value1', param2='value2')
+
+        # Assert the function returned the result from fetch
+        assert result == {"success": True, "data": "data", "link": None}
