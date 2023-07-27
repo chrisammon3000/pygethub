@@ -52,7 +52,7 @@ for user in users:
 To install `pygethub`, along with the tools you need to develop and run tests, run the following in your virtual environment:
 
 ```
-pip install -e .[dev]
+pip install -e .[dev,test]
 ```
 
 ## Contributing
