@@ -30,7 +30,12 @@ def calculate_delay(response):
 
 def fetch(url: str, token: str, **params) -> dict:
     session.headers["Authorization"] = f"token {token}"
-    
+
+    # Update the user-agent if provided in the params
+    if "user_agent" in params:
+        session.headers["User-Agent"] = params["user_agent"]
+        del params["user_agent"]
+
     try:
         response = session.get(url, params=params)
         response.raise_for_status()

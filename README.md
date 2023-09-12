@@ -25,6 +25,7 @@ pip install pygethub
 
 Here is an example of how you can use `pygethub`:
 
+<!-- TODO Add example of using paginator with params, see gfe-db notebook for GitHub EDA list_branches -->
 ```python
 from pygethub import list_commits, GitHubPaginator, list_users
 
@@ -35,7 +36,7 @@ print(commits)
 # Use pagination to list users
 paginator = GitHubPaginator('your-github-token')
 
-# List users from the beginning
+# List users from the beginning, include other request parameters as keyword arguments
 users = paginator.get_paginator(list_users)
 for user in users:
     print(user)
