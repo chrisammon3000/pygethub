@@ -29,7 +29,10 @@ def calculate_delay(response):
     return delay
 
 def fetch(url: str, token: str, **params) -> dict:
-    session.headers["Authorization"] = f"token {token}"
+
+    session.headers["Authorization"] = f"Bearer {token}"
+    session.headers["Accept"] = "application/vnd.github+json"
+    session.headers["X-GitHub-Api-Version"] = "2022-11-28"
 
     # Update the user-agent if provided in the params
     if "user_agent" in params:

@@ -10,7 +10,7 @@ write_to = "pygethub/_version.py"
 
 [project]
 name = "pygethub"
-version = "0.1.0"
+version = "0.1.1"
 description = "Fetch data from GitHub"
 authors = [{ name = "@chrisammon3000", email = "gclindsey@gmail.com" }]
 license = {file = "LICENSE"}
