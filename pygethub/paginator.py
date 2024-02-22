@@ -33,6 +33,7 @@ class PaginatedGitHubResource:
                     # If we don't have a next page URL, we fetch the first page
                     response = self.list_function(token=self.token, per_page=self.per_page, since=self.since, **self.kwargs)
                 
+                # TODO authentication and authorization errors should be raised here
                 self.data = response.get("data", [])
                 
                 if not self.data:

@@ -1,5 +1,6 @@
 import time
 import requests
+from .exceptions import BadRequest
 
 session = requests.Session()
 
@@ -33,18 +34,17 @@ def fetch(url: str, token: str, **params) -> dict:
     session.headers["Authorization"] = f"Bearer {token}"
     session.headers["Accept"] = "application/vnd.github+json"
     session.headers["X-GitHub-Api-Version"] = "2022-11-28"
-
+    
     # Update the user-agent if provided in the params
+    session.headers["User-Agent"] = params.get("user_agent")
     if "user_agent" in params:
-        session.headers["User-Agent"] = params["user_agent"]
         del params["user_agent"]
 
     try:
         response = session.get(url, params=params)
         response.raise_for_status()
     except requests.HTTPError as http_err:
-        # Add additional error information
-        return {"success": False, "message": str(http_err)}
+        return {"success": False, "status_code": response.status_code, "message": str(http_err), "details": getattr(response, "text", None)}
     except Exception as err:
         # Handle unexpected exceptions
         return {"success": False, "message": str(err)}
@@ -62,7 +62,13 @@ def list_github_resource(resource_path: str, token: str, **kwargs) -> dict:
     base_url = "https://api.github.com"
     url = base_url + resource_path
 
-    return fetch(url, token, **kwargs)
+    result = fetch(url, token, **kwargs)
+
+    # TODO update tests
+    if not result["success"]:
+        raise BadRequest(result)
+
+    return result
 
 # Wrapper functions for better readability and resource path consistency
 def list_commits(owner: str, repo: str, token: str, **kwargs) -> dict:

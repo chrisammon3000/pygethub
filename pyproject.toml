@@ -10,7 +10,7 @@ write_to = "pygethub/_version.py"
 
 [project]
 name = "pygethub"
-version = "0.1.1"
+version = "0.1.2"
 description = "Fetch data from GitHub"
 authors = [{ name = "@chrisammon3000", email = "gclindsey@gmail.com" }]
 license = {file = "LICENSE"}
@@ -26,7 +26,7 @@ classifiers = [
     "Topic :: Utilities",
 ]
 dependencies = [
-    "requests>=2.31.0",
+    "requests>=2.22.0",
 ]
 
 [project.optional-dependencies]
